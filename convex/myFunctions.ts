@@ -62,3 +62,20 @@ export const fetchRandomIdea = action({
     return idea;
   },
 });
+
+/**
+ * grabs top two documents from the images table and returns them,
+ * converting the storageID to a URL which can be supplied to img component.
+ */
+export const fetchTwoImages = query({
+  args: {},
+  handler: async (ctx) => {
+    const images = await ctx.db.query("images").take(2);
+    return Promise.all(
+      images.map(async (image) => ({
+        ...image,
+        ...{ url: await ctx.storage.getUrl(image.storageID) },
+      }))
+    );
+  },
+});
